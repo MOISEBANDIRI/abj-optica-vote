@@ -1,60 +1,10 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Eleição 2026–2027 | UABJ OPTICA STUDENT CHAPTER</title>
-<meta name="description" content="Processo eleitoral 2026–2027 do UABJ OPTICA STUDENT CHAPTER">
-<link rel="stylesheet" href="styles.css">
-</head>
-<body>
-<header class="hero">
-  <div class="light-lines" aria-hidden="true"></div>
-  <nav class="topbar">
-    <div class="brand"><span class="brand-main">OPTICA</span><span class="divider"></span><span>UABJ STUDENT CHAPTER</span></div>
-    <div class="institution">UFRPE · UABJ</div>
-  </nav>
-  <div class="hero-content">
-    <p class="eyebrow">PROCESSO ELEITORAL 2026–2027</p>
-    <h1>ELEIÇÃO DA PRIMEIRA DIRETORIA</h1>
-    <h2>UABJ OPTICA STUDENT CHAPTER</h2>
-    <p class="tagline">Advancing Optics and Photonics Together</p>
-    <p class="advisor">Faculty Advisor: Prof. Dr. Sabi Yari Moïse Bandiri</p>
-    <div id="statusBadge" class="status loading">Consultando eleição…</div>
-  </div>
-</header>
-
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Eleição 2026–2027 | UABJ OPTICA STUDENT CHAPTER</title><link rel="stylesheet" href="styles.css"></head><body>
+<header class="hero"><div class="light-lines"></div><nav class="topbar"><div class="brand"><span class="brand-main">OPTICA</span><span class="divider"></span><span>UABJ STUDENT CHAPTER</span></div><div class="institution">UFRPE · UABJ</div></nav><div class="hero-content"><p class="eyebrow">PROCESSO ELEITORAL 2026–2027</p><h1>ELEIÇÃO DA PRIMEIRA DIRETORIA</h1><h2>UABJ OPTICA STUDENT CHAPTER</h2><p class="tagline">Advancing Optics and Photonics Together</p><p class="advisor">Faculty Advisor: Prof. Dr. Sabi Yari Moïse Bandiri</p><div id="statusBadge" class="status loading">Consultando eleição…</div></div></header>
 <main>
-<section class="card intro">
-  <div>
-    <p class="section-kicker">VOTAÇÃO INSTITUCIONAL</p>
-    <h3>Escolha da primeira diretoria</h3>
-    <p>Ambiente eletrônico para participação dos integrantes elegíveis. O voto é secreto: o registro de participação é separado das escolhas da cédula.</p>
-  </div>
-  <div class="privacy"><strong>Privacidade eleitoral</strong><span>O painel administrativo não deve associar a identidade do eleitor às suas escolhas.</span></div>
-</section>
-
-<section id="closedPanel" class="card state-panel">
-  <div class="state-icon">●</div>
-  <div><h3 id="stateTitle">Carregando estado da eleição</h3><p id="stateText">Aguarde alguns segundos.</p></div>
-</section>
-
-<section id="ballotPreview" class="content-section">
-  <div class="section-head"><div><p class="section-kicker">CÉDULA</p><h3>Cargos e candidaturas</h3></div><span class="preview-label">Visualização</span></div>
-  <div id="positions" class="positions"><div class="skeleton"></div><div class="skeleton"></div></div>
-</section>
-
-<section class="card process">
-  <p class="section-kicker">COMO FUNCIONA</p>
-  <h3>Processo de votação</h3>
-  <div class="steps">
-    <div><b>01</b><span>Identificação do eleitor elegível</span></div>
-    <div><b>02</b><span>Preenchimento da cédula secreta</span></div>
-    <div><b>03</b><span>Revisão e confirmação definitiva</span></div>
-    <div><b>04</b><span>Emissão de protocolo sem revelar escolhas</span></div>
-  </div>
-</section>
-</main>
-
-<footer><div><strong>UABJ OPTICA STUDENT CHAPTER</strong><span>LIGHT FOR A BETTER TOMORROW</span></div><span>UABJ · Universidade Federal Rural de Pernambuco</span></footer>
-<script src="app.js"></script>
-</body></html>
+<section class="card intro"><div><p class="section-kicker">VOTAÇÃO INSTITUCIONAL</p><h3>Escolha da primeira diretoria</h3><p>Ambiente eletrônico para integrantes elegíveis. O registro de participação é separado da cédula, preservando o sigilo das escolhas.</p></div><div class="privacy"><strong>Voto secreto</strong><span>A confirmação registra que você participou, sem associar sua identidade às escolhas da cédula.</span></div></section>
+<section id="statePanel" class="card state-panel"><div class="state-icon">●</div><div><h3 id="stateTitle">Carregando estado da eleição</h3><p id="stateText">Aguarde alguns segundos.</p></div></section>
+<section id="loginPanel" class="card vote-box hidden"><p class="section-kicker">ACESSO DO ELEITOR</p><h3>Iniciar votação</h3><p>Digite o código individual fornecido pela organização.</p><div class="access-row"><input id="voterCode" type="password" autocomplete="one-time-code" placeholder="Código do eleitor"><button id="verifyBtn">Continuar</button></div><p id="accessMsg" class="msg"></p></section>
+<section id="votePanel" class="hidden"><div class="section-head"><div><p class="section-kicker">CÉDULA SECRETA</p><h3>Registre suas escolhas</h3></div><span id="voterHello" class="preview-label"></span></div><form id="ballotForm"><div id="ballot"></div><div class="card confirm-box"><label><input id="finalConfirm" type="checkbox" required> Revisei a cédula e confirmo que desejo registrar definitivamente este voto.</label><button id="submitVote" type="submit">REGISTRAR VOTO</button><p id="voteMsg" class="msg"></p></div></form></section>
+<section id="receiptPanel" class="card receipt hidden"><p class="section-kicker">VOTO REGISTRADO</p><h3>Participação confirmada</h3><p>Seu voto foi recebido. Guarde o protocolo abaixo. Ele comprova a participação, mas não revela suas escolhas.</p><div id="receiptCode" class="receipt-code"></div><div id="receiptTime" class="receipt-time"></div></section>
+<section id="previewSection" class="content-section"><div class="section-head"><div><p class="section-kicker">CÉDULA</p><h3>Cargos e candidaturas</h3></div><span class="preview-label">Visualização</span></div><div id="positions" class="positions"><div class="skeleton"></div></div></section>
+</main><footer><div><strong>UABJ OPTICA STUDENT CHAPTER</strong><span>LIGHT FOR A BETTER TOMORROW</span></div><span>UABJ · Universidade Federal Rural de Pernambuco</span></footer><script src="app.js"></script></body></html>
