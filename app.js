@@ -1,34 +1,10 @@
-const SUPABASE_URL='https://asmmfohbfyngblylrtlg.supabase.co';
-const SUPABASE_KEY='sb_publishable_6yEmva0YUFiwo0WPt78QpQ_3pjNNoV-';
-const headers={apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY};
-async function api(path){const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{headers});if(!r.ok)throw new Error(await r.text());return r.json()}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-async function load(){
- try{
-  const [cfg,positions,candidates]=await Promise.all([
-   api('election_config?select=*&id=eq.1'),
-   api('positions?select=*&order=sort_order.asc'),
-   api('candidates?select=*&active=eq.true')
-  ]);
-  const c=cfg[0]||{status:'closed'};
-  const badge=document.getElementById('statusBadge'), title=document.getElementById('stateTitle'), text=document.getElementById('stateText');
-  badge.className='status '+c.status;
-  if(c.status==='open'){badge.textContent='ELEIÇÃO ABERTA';title.textContent='Votação aberta';text.textContent='Eleitores elegíveis podem iniciar a votação.';document.querySelector('.state-icon').style.color='#10b981'}
-  else{badge.textContent='ELEIÇÃO FECHADA';title.textContent='A votação ainda não está aberta';text.textContent='A cédula pode ser visualizada abaixo. O acesso à votação será liberado pela organização do processo eleitoral.'}
-  const byPos={};candidates.forEach(x=>(byPos[x.position_id]??=[]).push(x));
-  document.getElementById('positions').innerHTML=positions.map(p=>{
-   const list=byPos[p.id]||[];
-   let body='';
-   if(p.ballot_type==='indication') body='<p class="empty">Sem candidatura registrada. O processo prevê autocandidatura ou indicação de integrante durante a votação.</p>';
-   else body=list.map(x=>'<div class="candidate"><span>'+esc(x.name)+'</span>'+(x.consent_status==='pending'?'<span class="pending">ANUÊNCIA PENDENTE</span>':'')+'</div>').join('');
-   return '<article class="position"><h4>'+esc(p.name)+'</h4>'+body+'</article>'
-  }).join('');
- }catch(e){
-  document.getElementById('statusBadge').textContent='INDISPONÍVEL';
-  document.getElementById('stateTitle').textContent='Não foi possível consultar a eleição';
-  document.getElementById('stateText').textContent='Tente novamente em alguns instantes.';
-  document.getElementById('positions').innerHTML='<article class="position"><p class="empty">Falha temporária ao carregar os dados.</p></article>';
-  console.error(e)
- }
-}
+const U='https://asmmfohbfyngblylrtlg.supabase.co',K='sb_publishable_6yEmva0YUFiwo0WPt78QpQ_3pjNNoV-',H={apikey:K,Authorization:'Bearer '+K,'Content-Type':'application/json'};let P=[],C=[],M=[],code='';
+const $=x=>document.getElementById(x),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function get(p){let r=await fetch(U+'/rest/v1/'+p,{headers:H});if(!r.ok)throw Error(await r.text());return r.json()}
+async function rpc(fn,b){let r=await fetch(U+'/rest/v1/rpc/'+fn,{method:'POST',headers:H,body:JSON.stringify(b)});let t=await r.text();if(!r.ok)throw Error(t);return JSON.parse(t)}
+function opts(p){let cs=C.filter(c=>c.position_id===p.id&&c.consent_status==='confirmed');if(p.ballot_type==='competitive')return cs.map(c=>`<label class="option"><input required type="radio" name="p${p.id}" value="candidate:${c.id}"><span>${esc(c.name)}</span></label>`).join('')+`<label class="option"><input required type="radio" name="p${p.id}" value="blank:"><span>Voto em branco</span></label>`;if(p.ballot_type==='confirmation'){let c=cs[0];return ['confirm|Confirmo','not_confirm|Não confirmo','blank|Voto em branco'].map(x=>{let[a,b]=x.split('|');return `<label class="option"><input required type="radio" name="p${p.id}" value="${a}:${c?.id||''}"><span>${b}${c?' — '+esc(c.name):''}</span></label>`}).join('')}let members=M.map(m=>`<option value="${m.id}">${esc(m.full_name)}</option>`).join('');return `<label class="option"><input required type="radio" name="p${p.id}" value="self_candidate:"><span>Quero me candidatar a este cargo</span></label><label class="option"><input required type="radio" name="p${p.id}" value="nominate:"><span>Quero indicar outro integrante do Chapter</span></label><select id="nom${p.id}" class="nominee"><option value="">Selecione o integrante</option>${members}</select><label class="option"><input required type="radio" name="p${p.id}" value="no_nomination:"><span>Não desejo fazer indicação</span></label>`}
+function renderBallot(){$('ballot').innerHTML=P.map((p,i)=>`<article class="card ballot-card"><div class="ballot-num">${String(i+1).padStart(2,'0')}</div><div><h3>${esc(p.name)}</h3><div class="options">${opts(p)}</div></div></article>`).join('')}
+async function load(){try{let[cfg,p,c,m]=await Promise.all([get('election_config?select=*&id=eq.1'),get('positions?select=*&order=sort_order.asc'),get('candidates?select=*&active=eq.true'),get('members?select=*&active=eq.true&order=full_name.asc')]);P=p;C=c;M=m;let st=cfg[0]?.status||'closed';$('statusBadge').className='status '+st;if(st==='open'){$('statusBadge').textContent='ELEIÇÃO ABERTA';$('stateTitle').textContent='Votação aberta';$('stateText').textContent='Eleitores elegíveis podem iniciar a votação usando seu código individual.';$('loginPanel').classList.remove('hidden');document.querySelector('.state-icon').style.color='#10b981'}else{$('statusBadge').textContent='ELEIÇÃO FECHADA';$('stateTitle').textContent='A votação ainda não está aberta';$('stateText').textContent='A organização abrirá o sistema após os testes finais.'}let by={};C.forEach(x=>(by[x.position_id]??=[]).push(x));$('positions').innerHTML=P.map(p=>`<article class="position"><h4>${esc(p.name)}</h4>${p.ballot_type==='indication'?'<p class="empty">Autocandidatura ou indicação durante a votação.</p>':(by[p.id]||[]).map(x=>`<div class="candidate"><span>${esc(x.name)}</span>${x.consent_status==='pending'?'<span class="pending">ANUÊNCIA PENDENTE</span>':''}</div>`).join('')}</article>`).join('')}catch(e){$('statusBadge').textContent='INDISPONÍVEL';$('stateTitle').textContent='Falha ao carregar';console.error(e)}}
+$('verifyBtn').onclick=async()=>{let v=$('voterCode').value.trim();if(!v)return;$('verifyBtn').disabled=true;$('accessMsg').textContent='Verificando…';try{let r=await rpc('verify_voter',{p_code:v});if(!r.valid){$('accessMsg').textContent=r.reason==='already_voted'?'Este código já registrou participação.':r.reason==='closed'?'A eleição está fechada.':'Código não reconhecido.';return}code=v;$('loginPanel').classList.add('hidden');$('previewSection').classList.add('hidden');$('votePanel').classList.remove('hidden');$('voterHello').textContent=r.display_name?'Eleitor: '+r.display_name:'Eleitor validado';renderBallot();scrollTo({top:$('votePanel').offsetTop-20,behavior:'smooth'})}catch(e){$('accessMsg').textContent='Não foi possível validar o código.'}finally{$('verifyBtn').disabled=false}};
+$('ballotForm').onsubmit=async e=>{e.preventDefault();let choices=[];for(let p of P){let r=document.querySelector('input[name="p'+p.id+'"]:checked');if(!r){$('voteMsg').textContent='Preencha todos os cargos.';return}let[t,id]=r.value.split(':');let o={position_id:p.id,choice_type:t,candidate_id:id||null,nominated_member_id:null};if(t==='nominate'){let m=$('nom'+p.id).value;if(!m){$('voteMsg').textContent='Selecione o integrante indicado em '+p.name+'.';return}o.nominated_member_id=m}choices.push(o)}$('submitVote').disabled=true;$('voteMsg').textContent='Registrando voto…';try{let r=await rpc('cast_vote',{p_code:code,p_choices:choices});$('votePanel').classList.add('hidden');$('receiptPanel').classList.remove('hidden');$('receiptCode').textContent=r.receipt;$('receiptTime').textContent='Registrado em '+new Date(r.submitted_at).toLocaleString('pt-BR');scrollTo({top:$('receiptPanel').offsetTop-20,behavior:'smooth'})}catch(e){$('voteMsg').textContent=e.message.includes('ALREADY_VOTED')?'Este eleitor já votou.':'Não foi possível registrar. Nenhum voto foi confirmado.';$('submitVote').disabled=false}};
 load();
